@@ -29,10 +29,10 @@ class QBattMain : public QMainWindow
 
 	private:
 		QString trayText;
+		QString trayToolTipText;
 		QFont trayFont;
 		QPixmap trayPixmap;
 		QPainter *trayPainter;
-		qint8 trayCapacity;
 
 	private:
 		void updateStaticTableContents();

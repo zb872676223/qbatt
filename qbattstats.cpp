@@ -8,6 +8,7 @@
 #define DEF_CHARGE_FULL			"charge_full"
 #define DEF_CHARGE_FULL_DESIGN	"charge_full_design"
 #define DEF_CHARGE_NOW			"charge_now"
+#define DEF_CURRENT_NOW			"current_now"
 #define DEF_CYCLE_COUNT			"cycle_count"
 #define DEF_MANUFACTURER		"manufacturer"
 #define DEF_MODEL_NAME			"model_name"
@@ -80,6 +81,11 @@ QString QBattStats::getChargeFullDesign()
 QString QBattStats::getChargeNow()
 {
 	return (getFileContents(DEF_CHARGE_NOW));
+}
+
+QString QBattStats::getCurrentNow()
+{
+	return (getFileContents(DEF_CURRENT_NOW));
 }
 
 QString QBattStats::getCycleCount()

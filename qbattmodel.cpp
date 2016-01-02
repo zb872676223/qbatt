@@ -13,6 +13,7 @@ QBattModel::QBattModel(QTableWidget *wdgt)
 			<< "Charge full"
 			<< "Charge full (design)"
 			<< "Charge now"
+			<< "Current now"
 			<< "Cycle count"
 			<< "Manufacturer"
 			<< "Model name"

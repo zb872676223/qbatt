@@ -15,6 +15,7 @@ class QBattStats
 		QString getChargeFull();
 		QString getChargeFullDesign();
 		QString getChargeNow();
+		QString getCurrentNow();
 		QString getCycleCount();
 		QString getManufacturer();
 		QString getModelName();

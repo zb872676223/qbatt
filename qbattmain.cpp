@@ -84,6 +84,8 @@ void QBattMain::updateDynamicTableContents()
 			stats->getChargeFullDesign());
 		model->setValue(ROW_CHARGE_NOW,
 			stats->getChargeNow());
+		model->setValue(ROW_CURRENT_NOW,
+			stats->getCurrentNow());
 		model->setValue(ROW_CYCLE_COUNT,
 			stats->getCycleCount());
 		model->setValue(ROW_PRESENT,
@@ -99,18 +101,32 @@ void QBattMain::updateDynamicTableContents()
 
 void QBattMain::updateTrayLabel()
 {
-	trayCapacity = stats->getCapacity().toInt();
+	qint8 trayCapacity = stats->getCapacity().toInt();;
+	qint16 dischargeRate = stats->getCurrentNow().toInt() / 1000;
+	QString battStatus = stats->getStatus().trimmed();
+
 	if (trayCapacity == 100) {
 		trayIcon->setVisible(false);
 		return;
 	}
+
+	trayToolTipText.clear();
+
+	trayToolTipText.append("Status: ");
+	trayToolTipText.append(battStatus);
+	trayToolTipText.append(QString().sprintf("\nRate: %dmAh", dischargeRate));
+	trayToolTipText.append(QString().sprintf("\nCapacity: %d%%", trayCapacity));
 
 	trayText.sprintf("%d", trayCapacity);
 
 	trayPainter->eraseRect(trayPixmap.rect());
 	trayPainter->drawText(trayPixmap.rect(), Qt::AlignCenter, trayText);
 	trayIcon->setIcon(trayPixmap);
+
+	trayIcon->setToolTip(trayToolTipText);
+
 	trayIcon->setVisible(true);
+
 }
 
 void QBattMain::systemExit()
