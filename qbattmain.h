@@ -23,13 +23,24 @@ class QBattMain : public QMainWindow
 		QBattModel *model;
 		QTableWidget *widget;
 		QBattStats *stats;
-		QTimer *timer;
+		QTimer *contentsTimer;
+		QTimer *trayTimer;
+		QSystemTrayIcon *trayIcon;
+
+	private:
+		QString trayText;
+		QFont trayFont;
+		QPixmap trayPixmap;
+		QPainter *trayPainter;
+		qint8 trayCapacity;
 
 	private:
 		void updateStaticTableContents();
 
 	private slots:
 		void updateDynamicTableContents();
+		void updateTrayLabel();
+		void systemExit();
 };
 
 #endif // QBATTMAIN_H

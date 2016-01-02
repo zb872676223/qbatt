@@ -1,6 +1,7 @@
 #include <QSystemTrayIcon>
+#include <QPainter>
+#include <QPixmap>
 #include <QTimer>
-#include <QDebug>
 #include "qbattmain.h"
 #include "qbattstats.h"
 #include "ui_qbattmain.h"
@@ -11,23 +12,43 @@ QBattMain::QBattMain(QWidget *parent) :
 {
 	ui->setupUi(this);
 
+	trayFont = QFont("Hack", 10);
+	trayPixmap = QPixmap(16, 16);
+	trayPixmap.fill(Qt::white);
+	trayPainter = new QPainter(&trayPixmap);
+	trayPainter->setFont(trayFont);
+
+	trayIcon = new QSystemTrayIcon(this);
+	trayIcon->setVisible(false);
+
 	model = new QBattModel(ui->tableWidget);
 	stats = new QBattStats();
-	timer = new QTimer(this);
-	timer->setInterval(1000);
-	timer->start();
+
+	contentsTimer = new QTimer(this);
+	contentsTimer->setInterval(1000);
 
 	// Initial data update
 	updateDynamicTableContents();
 	updateStaticTableContents();
 
-	QObject::connect(timer, SIGNAL(timeout()),
+	trayTimer = new QTimer(this);
+	trayTimer->setInterval(1000);
+	trayTimer->start();
+
+	QObject::connect(contentsTimer, SIGNAL(timeout()),
 			this, SLOT(updateDynamicTableContents()));
+	QObject::connect(trayTimer, SIGNAL(timeout()),
+			this, SLOT(updateTrayLabel()));
+	QObject::connect(trayIcon, SIGNAL(activated(QSystemTrayIcon::ActivationReason)),
+			this, SLOT(systemExit()));
 }
 
 QBattMain::~QBattMain()
 {
-	timer->stop();
+	if (contentsTimer->isActive())
+		contentsTimer->stop();
+	if (trayTimer->isActive())
+		trayTimer->stop();
 
 	delete ui;
 }
@@ -74,4 +95,25 @@ void QBattMain::updateDynamicTableContents()
 	}
 
 	ui->tableWidget->resizeColumnsToContents();
+}
+
+void QBattMain::updateTrayLabel()
+{
+	trayCapacity = stats->getCapacity().toInt();
+	if (trayCapacity == 100) {
+		trayIcon->setVisible(false);
+		return;
+	}
+
+	trayText.sprintf("%d", trayCapacity);
+
+	trayPainter->eraseRect(trayPixmap.rect());
+	trayPainter->drawText(trayPixmap.rect(), Qt::AlignCenter, trayText);
+	trayIcon->setIcon(trayPixmap);
+	trayIcon->setVisible(true);
+}
+
+void QBattMain::systemExit()
+{
+	exit(0);
 }
