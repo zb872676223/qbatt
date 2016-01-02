@@ -59,75 +59,75 @@ QString QBattStats::getFileContents(QString f)
 
 QString QBattStats::getCapacity()
 {
-	return (this->getFileContents(DEF_CAPACITY));
+	return (getFileContents(DEF_CAPACITY));
 }
 
 QString QBattStats::getCapacityLevel()
 {
-	return (this->getFileContents(DEF_CAPACITY_LEVEL));
+	return (getFileContents(DEF_CAPACITY_LEVEL));
 }
 
 QString QBattStats::getChargeFull()
 {
-	return (this->getFileContents(DEF_CHARGE_FULL));
+	return (getFileContents(DEF_CHARGE_FULL));
 }
 
 QString QBattStats::getChargeFullDesign()
 {
-	return (this->getFileContents(DEF_CHARGE_FULL_DESIGN));
+	return (getFileContents(DEF_CHARGE_FULL_DESIGN));
 }
 
 QString QBattStats::getChargeNow()
 {
-	return (this->getFileContents(DEF_CHARGE_NOW));
+	return (getFileContents(DEF_CHARGE_NOW));
 }
 
 QString QBattStats::getCycleCount()
 {
-	return (this->getFileContents(DEF_CYCLE_COUNT));
+	return (getFileContents(DEF_CYCLE_COUNT));
 }
 
 QString QBattStats::getManufacturer()
 {
-	return (this->getFileContents(DEF_MANUFACTURER));
+	return (getFileContents(DEF_MANUFACTURER));
 }
 
 QString QBattStats::getModelName()
 {
-	return (this->getFileContents(DEF_MODEL_NAME));
+	return (getFileContents(DEF_MODEL_NAME));
 }
 
 QString QBattStats::getPresent()
 {
-	return (this->getFileContents(DEF_PRESENT));
+	return (getFileContents(DEF_PRESENT));
 }
 
 QString QBattStats::getSerialNumber()
 {
-	return (this->getFileContents(DEF_SERIAL_NUMBER));
+	return (getFileContents(DEF_SERIAL_NUMBER));
 }
 
 QString QBattStats::getStatus()
 {
-	return (this->getFileContents(DEF_STATUS));
+	return (getFileContents(DEF_STATUS));
 }
 
 QString QBattStats::getTechnology()
 {
-	return (this->getFileContents(DEF_TECHNOLOGY));
+	return (getFileContents(DEF_TECHNOLOGY));
 }
 
 QString QBattStats::getType()
 {
-	return (this->getFileContents(DEF_TYPE));
+	return (getFileContents(DEF_TYPE));
 }
 
 QString QBattStats::getVoltageMinDesign()
 {
-	return (this->getFileContents(DEF_VOLTAGE_MIN_DESIGN));
+	return (getFileContents(DEF_VOLTAGE_MIN_DESIGN));
 }
 
 QString QBattStats::getVoltageNow()
 {
-	return (this->getFileContents(DEF_VOLTAGE_NOW));
+	return (getFileContents(DEF_VOLTAGE_NOW));
 }

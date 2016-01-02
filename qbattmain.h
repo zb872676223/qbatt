@@ -2,6 +2,7 @@
 #define QBATTMAIN_H
 
 #include <QMainWindow>
+#include <QSystemTrayIcon>
 #include "qbattmodel.h"
 #include "qbattstats.h"
 
@@ -22,9 +23,13 @@ class QBattMain : public QMainWindow
 		QBattModel *model;
 		QTableWidget *widget;
 		QBattStats *stats;
+		QTimer *timer;
 
 	private:
-		void updateTableContents();
+		void updateStaticTableContents();
+
+	private slots:
+		void updateDynamicTableContents();
 };
 
 #endif // QBATTMAIN_H

@@ -1,3 +1,5 @@
+#include <QSystemTrayIcon>
+#include <QTimer>
 #include <QDebug>
 #include "qbattmain.h"
 #include "qbattstats.h"
@@ -9,50 +11,66 @@ QBattMain::QBattMain(QWidget *parent) :
 {
 	ui->setupUi(this);
 
-	this->model = new QBattModel(ui->tableWidget);
-	this->stats = new QBattStats();
+	model = new QBattModel(ui->tableWidget);
+	stats = new QBattStats();
+	timer = new QTimer(this);
+	timer->setInterval(1000);
+	timer->start();
 
-	this->updateTableContents();
+	// Initial data update
+	updateDynamicTableContents();
+	updateStaticTableContents();
+
+	QObject::connect(timer, SIGNAL(timeout()),
+			this, SLOT(updateDynamicTableContents()));
 }
 
 QBattMain::~QBattMain()
 {
+	timer->stop();
+
 	delete ui;
 }
 
-void QBattMain::updateTableContents()
+void QBattMain::updateStaticTableContents()
 {
-	if (this->stats->checkDirExists()) {
-		this->model->setValue(ROW_CAPACITY,
-			this->stats->getCapacity());
-		this->model->setValue(ROW_CAPACITY_LEVEL,
-			this->stats->getCapacityLevel());
-		this->model->setValue(ROW_CHARGE_FULL,
-			this->stats->getChargeFull());
-		this->model->setValue(ROW_CHARGE_FULL_DESIGN,
-			this->stats->getChargeFullDesign());
-		this->model->setValue(ROW_CHARGE_NOW,
-			this->stats->getChargeNow());
-		this->model->setValue(ROW_CYCLE_COUNT,
-			this->stats->getCycleCount());
-		this->model->setValue(ROW_MANUFACTURER,
-			this->stats->getManufacturer());
-		this->model->setValue(ROW_MODEL_NAME,
-			this->stats->getModelName());
-		this->model->setValue(ROW_PRESENT,
-			this->stats->getPresent());
-		this->model->setValue(ROW_SERIAL_NUMBER,
-			this->stats->getSerialNumber());
-		this->model->setValue(ROW_STATUS,
-			this->stats->getStatus());
-		this->model->setValue(ROW_TECHNOLOGY,
-			this->stats->getTechnology());
-		this->model->setValue(ROW_TYPE,
-			this->stats->getType());
-		this->model->setValue(ROW_VOLTAGE_MIN_DESIGN,
-			this->stats->getVoltageMinDesign());
-		this->model->setValue(ROW_VOLTAGE_NOW,
-			this->stats->getVoltageNow());
+	if (stats->checkDirExists()) {
+		model->setValue(ROW_MANUFACTURER,
+			stats->getManufacturer());
+		model->setValue(ROW_MODEL_NAME,
+			stats->getModelName());
+		model->setValue(ROW_SERIAL_NUMBER,
+			stats->getSerialNumber());
+		model->setValue(ROW_TECHNOLOGY,
+			stats->getTechnology());
+		model->setValue(ROW_TYPE,
+			stats->getType());
+		model->setValue(ROW_VOLTAGE_MIN_DESIGN,
+			stats->getVoltageMinDesign());
+	}
+}
+
+void QBattMain::updateDynamicTableContents()
+{
+	if (stats->checkDirExists()) {
+		model->setValue(ROW_CAPACITY,
+			stats->getCapacity());
+		model->setValue(ROW_CAPACITY_LEVEL,
+			stats->getCapacityLevel());
+		model->setValue(ROW_CHARGE_FULL,
+			stats->getChargeFull());
+		model->setValue(ROW_CHARGE_FULL_DESIGN,
+			stats->getChargeFullDesign());
+		model->setValue(ROW_CHARGE_NOW,
+			stats->getChargeNow());
+		model->setValue(ROW_CYCLE_COUNT,
+			stats->getCycleCount());
+		model->setValue(ROW_PRESENT,
+			stats->getPresent());
+		model->setValue(ROW_STATUS,
+			stats->getStatus());
+		model->setValue(ROW_VOLTAGE_NOW,
+			stats->getVoltageNow());
 	}
 
 	ui->tableWidget->resizeColumnsToContents();
