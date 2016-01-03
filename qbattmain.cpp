@@ -101,22 +101,24 @@ void QBattMain::updateDynamicTableContents()
 void QBattMain::updateTrayLabel()
 {
 	qint8 trayCapacity = stats->getCapacity().toInt();;
-	qint16 dischargeRate = stats->getCurrentNow().toInt() / 1000;
+	qint16 currentRate = stats->getCurrentNow().toInt() / 1000;
 	QString battStatus = stats->getStatus().trimmed();
 
 	trayToolTipText.clear();
 
 	trayToolTipText.append("Status: ");
 	trayToolTipText.append(battStatus);
-	trayToolTipText.append(QString().sprintf("\nRate: %dmAh", dischargeRate));
-	trayToolTipText.append(QString().sprintf("\nCapacity: %d%%", trayCapacity));
 
 	trayText.clear();
 
 	if (trayCapacity == 100)
 		trayText.append("F");
-	else
+	else {
+		trayToolTipText.append(QString().sprintf("\nRate: %dmAh", currentRate));
 		trayText.sprintf("%d", trayCapacity);
+	}
+
+	trayToolTipText.append(QString().sprintf("\nCapacity: %d%%", trayCapacity));
 
 	trayPainter = new QPainter(&trayPixmap);
 	trayPainter->setFont(trayFont);
