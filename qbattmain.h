@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 #include <QSystemTrayIcon>
+#include <QMessageBox>
 #include "qbattmodel.h"
 #include "qbattstats.h"
 
@@ -26,6 +27,7 @@ class QBattMain : public QMainWindow
 		QTimer *contentsTimer;
 		QTimer *trayTimer;
 		QSystemTrayIcon *trayIcon;
+		QMessageBox *msg;
 
 	private:
 		QString trayText;
@@ -40,7 +42,7 @@ class QBattMain : public QMainWindow
 	private slots:
 		void updateDynamicTableContents();
 		void updateTrayLabel();
-		void systemExit();
+		void exitApplication();
 };
 
 #endif // QBATTMAIN_H

@@ -1,4 +1,5 @@
 #include <QSystemTrayIcon>
+#include <QMessageBox>
 #include <QPainter>
 #include <QPixmap>
 #include <QTimer>
@@ -15,8 +16,6 @@ QBattMain::QBattMain(QWidget *parent) :
 	trayFont = QFont("Hack", 10);
 	trayPixmap = QPixmap(16, 16);
 	trayPixmap.fill(Qt::white);
-	trayPainter = new QPainter(&trayPixmap);
-	trayPainter->setFont(trayFont);
 
 	trayIcon = new QSystemTrayIcon(this);
 	trayIcon->setVisible(false);
@@ -40,7 +39,7 @@ QBattMain::QBattMain(QWidget *parent) :
 	QObject::connect(trayTimer, SIGNAL(timeout()),
 			this, SLOT(updateTrayLabel()));
 	QObject::connect(trayIcon, SIGNAL(activated(QSystemTrayIcon::ActivationReason)),
-			this, SLOT(systemExit()));
+			this, SLOT(exitApplication()));
 }
 
 QBattMain::~QBattMain()
@@ -105,11 +104,6 @@ void QBattMain::updateTrayLabel()
 	qint16 dischargeRate = stats->getCurrentNow().toInt() / 1000;
 	QString battStatus = stats->getStatus().trimmed();
 
-	if (trayCapacity == 100) {
-		trayIcon->setVisible(false);
-		return;
-	}
-
 	trayToolTipText.clear();
 
 	trayToolTipText.append("Status: ");
@@ -117,19 +111,41 @@ void QBattMain::updateTrayLabel()
 	trayToolTipText.append(QString().sprintf("\nRate: %dmAh", dischargeRate));
 	trayToolTipText.append(QString().sprintf("\nCapacity: %d%%", trayCapacity));
 
-	trayText.sprintf("%d", trayCapacity);
+	trayText.clear();
+
+	if (trayCapacity == 100)
+		trayText.append("F");
+	else
+		trayText.sprintf("%d", trayCapacity);
+
+	trayPainter = new QPainter(&trayPixmap);
+	trayPainter->setFont(trayFont);
 
 	trayPainter->eraseRect(trayPixmap.rect());
 	trayPainter->drawText(trayPixmap.rect(), Qt::AlignCenter, trayText);
 	trayIcon->setIcon(trayPixmap);
 
 	trayIcon->setToolTip(trayToolTipText);
-
 	trayIcon->setVisible(true);
 
+	delete trayPainter;
 }
 
-void QBattMain::systemExit()
+void QBattMain::exitApplication()
 {
-	exit(0);
+	msg = new QMessageBox(QMessageBox::Information, "Exit qbatt:", "Do you really want to exit?",
+		QMessageBox::Yes | QMessageBox::Cancel, NULL);
+
+	int ret = msg->exec();
+	delete msg;
+
+	switch (ret) {
+		case QMessageBox::Yes:
+			exit(0);
+			break;
+		case QMessageBox::Cancel:
+		default:
+			return;
+			break;
+	}
 }
