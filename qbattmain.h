@@ -4,12 +4,7 @@
 #include <QMainWindow>
 #include <QSystemTrayIcon>
 #include <QMessageBox>
-#include "qbattmodel.h"
 #include "qbattstats.h"
-
-namespace Ui {
-	class QBattMain;
-}
 
 class QBattMain : public QMainWindow
 {
@@ -20,14 +15,9 @@ class QBattMain : public QMainWindow
 		~QBattMain();
 
 	private:
-		Ui::QBattMain *ui;
-		QBattModel *model;
-		QTableWidget *widget;
 		QBattStats *stats;
-		QTimer *contentsTimer;
 		QTimer *trayTimer;
 		QSystemTrayIcon *trayIcon;
-		QMessageBox *msg;
 
 	private:
 		QString trayText;
@@ -36,13 +26,9 @@ class QBattMain : public QMainWindow
 		QPixmap trayPixmap;
 		QPainter *trayPainter;
 
-	private:
-		void updateStaticTableContents();
-
 	private slots:
-		void updateDynamicTableContents();
 		void updateTrayLabel();
-		void exitApplication();
+		void exitApplication(QSystemTrayIcon::ActivationReason reason);
 };
 
 #endif // QBATTMAIN_H

@@ -14,11 +14,9 @@ TEMPLATE = app
 
 SOURCES += main.cpp\
         qbattmain.cpp \
-    qbattmodel.cpp \
     qbattstats.cpp
 
 HEADERS  += qbattmain.h \
-    qbattmodel.h \
     qbattstats.h
 
-FORMS    += qbattmain.ui
+FORMS    +=

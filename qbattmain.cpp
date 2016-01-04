@@ -3,16 +3,13 @@
 #include <QPainter>
 #include <QPixmap>
 #include <QTimer>
+#include <QDebug>
 #include "qbattmain.h"
 #include "qbattstats.h"
-#include "ui_qbattmain.h"
 
 QBattMain::QBattMain(QWidget *parent) :
-	QMainWindow(parent),
-	ui(new Ui::QBattMain)
+	QMainWindow(parent)
 {
-	ui->setupUi(this);
-
 	trayFont = QFont("Hack", 10);
 	trayPixmap = QPixmap(16, 16);
 	trayPixmap.fill(Qt::white);
@@ -20,82 +17,27 @@ QBattMain::QBattMain(QWidget *parent) :
 	trayIcon = new QSystemTrayIcon(this);
 	trayIcon->setVisible(false);
 
-	model = new QBattModel(ui->tableWidget);
 	stats = new QBattStats();
-
-	contentsTimer = new QTimer(this);
-	contentsTimer->setInterval(1000);
-
-	// Initial data update
-	updateDynamicTableContents();
-	updateStaticTableContents();
 
 	trayTimer = new QTimer(this);
 	trayTimer->setInterval(1000);
 	trayTimer->start();
 
-	QObject::connect(contentsTimer, SIGNAL(timeout()),
-			this, SLOT(updateDynamicTableContents()));
 	QObject::connect(trayTimer, SIGNAL(timeout()),
 			this, SLOT(updateTrayLabel()));
 	QObject::connect(trayIcon, SIGNAL(activated(QSystemTrayIcon::ActivationReason)),
-			this, SLOT(exitApplication()));
+			this, SLOT(exitApplication(QSystemTrayIcon::ActivationReason)));
 }
 
 QBattMain::~QBattMain()
 {
-	if (contentsTimer->isActive())
-		contentsTimer->stop();
 	if (trayTimer->isActive())
 		trayTimer->stop();
 
-	delete ui;
-}
-
-void QBattMain::updateStaticTableContents()
-{
-	if (stats->checkDirExists()) {
-		model->setValue(ROW_MANUFACTURER,
-			stats->getManufacturer());
-		model->setValue(ROW_MODEL_NAME,
-			stats->getModelName());
-		model->setValue(ROW_SERIAL_NUMBER,
-			stats->getSerialNumber());
-		model->setValue(ROW_TECHNOLOGY,
-			stats->getTechnology());
-		model->setValue(ROW_TYPE,
-			stats->getType());
-		model->setValue(ROW_VOLTAGE_MIN_DESIGN,
-			stats->getVoltageMinDesign());
-	}
-}
-
-void QBattMain::updateDynamicTableContents()
-{
-	if (stats->checkDirExists()) {
-		model->setValue(ROW_CAPACITY,
-			stats->getCapacity());
-		model->setValue(ROW_CAPACITY_LEVEL,
-			stats->getCapacityLevel());
-		model->setValue(ROW_CHARGE_FULL,
-			stats->getChargeFull());
-		model->setValue(ROW_CHARGE_FULL_DESIGN,
-			stats->getChargeFullDesign());
-		model->setValue(ROW_CHARGE_NOW,
-			stats->getChargeNow());
-		model->setValue(ROW_CURRENT_NOW,
-			stats->getCurrentNow());
-		model->setValue(ROW_CYCLE_COUNT,
-			stats->getCycleCount());
-		model->setValue(ROW_PRESENT,
-			stats->getPresent());
-		model->setValue(ROW_STATUS,
-			stats->getStatus());
-		model->setValue(ROW_VOLTAGE_NOW,
-			stats->getVoltageNow());
-	}
-
-	ui->tableWidget->resizeColumnsToContents();
+	// Release memory
+	delete stats;
+	delete trayTimer;
+	delete trayIcon;
 }
 
 void QBattMain::updateTrayLabel()
@@ -133,21 +75,30 @@ void QBattMain::updateTrayLabel()
 	delete trayPainter;
 }
 
-void QBattMain::exitApplication()
+void QBattMain::exitApplication(QSystemTrayIcon::ActivationReason reason)
 {
-	msg = new QMessageBox(QMessageBox::Information, "Exit qbatt:", "Do you really want to exit?",
-		QMessageBox::Yes | QMessageBox::Cancel, NULL);
+	if (reason == QSystemTrayIcon::DoubleClick) {
+		QMessageBox *msg = new QMessageBox(QMessageBox::Information, "Exit qbatt:", "Do you really want to exit?",
+			QMessageBox::Yes | QMessageBox::Cancel, NULL);
 
-	int ret = msg->exec();
-	delete msg;
+		int ret = msg->exec();
+		delete msg;
 
-	switch (ret) {
-		case QMessageBox::Yes:
-			exit(0);
-			break;
-		case QMessageBox::Cancel:
-		default:
-			return;
-			break;
+		switch (ret) {
+			case QMessageBox::Yes:
+				// Stop the timer
+				trayTimer->stop();
+				// Release memory
+				delete stats;
+				delete trayTimer;
+				delete trayIcon;
+
+				exit(0);
+				break;
+			case QMessageBox::Cancel:
+				break;
+		}
 	}
+
+	return;
 }
