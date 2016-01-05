@@ -62,7 +62,7 @@ void QBattMain::updateTrayLabel()
 	if (trayCapacity == 100)
 		trayText.append("F");
 	else {
-		if ((adapterStatus) and (currentRate != 0))
+		if ((!adapterStatus) and (currentRate != 0))
 			trayToolTipText.append(QString().sprintf("\nRate: %d mAh",
 													currentRate));
 
