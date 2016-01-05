@@ -3,44 +3,51 @@
 #include <QDebug>
 #include "qbattstats.h"
 
-#define DEF_CAPACITY			"capacity"
-#define DEF_CAPACITY_LEVEL		"capacity_level"
-#define DEF_CHARGE_FULL			"charge_full"
-#define DEF_CHARGE_FULL_DESIGN	"charge_full_design"
-#define DEF_CHARGE_NOW			"charge_now"
-#define DEF_CURRENT_NOW			"current_now"
-#define DEF_CYCLE_COUNT			"cycle_count"
-#define DEF_MANUFACTURER		"manufacturer"
-#define DEF_MODEL_NAME			"model_name"
-#define DEF_PRESENT				"present"
-#define DEF_SERIAL_NUMBER		"serial_number"
-#define DEF_STATUS				"status"
-#define DEF_TECHNOLOGY			"technology"
-#define DEF_TYPE				"type"
-#define DEF_VOLTAGE_MIN_DESIGN	"voltage_min_design"
-#define DEF_VOLTAGE_NOW			"voltage_now"
+#define DEF_BATT_CAPACITY			"capacity"
+#define DEF_BATT_CAPACITY_LEVEL		"capacity_level"
+#define DEF_BATT_CHARGE_FULL		"charge_full"
+#define DEF_BATT_CHARGE_FULL_DESIGN	"charge_full_design"
+#define DEF_BATT_CHARGE_NOW			"charge_now"
+#define DEF_BATT_CURRENT_NOW		"current_now"
+#define DEF_BATT_CYCLE_COUNT		"cycle_count"
+#define DEF_BATT_MANUFACTURER		"manufacturer"
+#define DEF_BATT_MODEL_NAME			"model_name"
+#define DEF_BATT_PRESENT			"present"
+#define DEF_BATT_SERIAL_NUMBER		"serial_number"
+#define DEF_BATT_STATUS				"status"
+#define DEF_BATT_TECHNOLOGY			"technology"
+#define DEF_BATT_TYPE				"type"
+#define DEF_BATT_VOLTAGE_MIN_DESIGN	"voltage_min_design"
+#define DEF_BATT_VOLTAGE_NOW		"voltage_now"
 
-#define DEF_SYS_PATH			"/sys/class/power_supply/BAT1"
-#define RESPONSE_N_A			"n/a"
+#define DEF_ACAD_ONLINE				"online"
+#define DEF_ACAD_TYPE				"type"
+
+#define DEF_SYS_PATH_BATT1			"/sys/class/power_supply/BAT1"
+#define DEF_SYS_PATH_ACAD			"/sys/class/power_supply/ACAD"
+#define RESPONSE_N_A				"n/a"
 
 QBattStats::QBattStats()
 {
 
 }
 
-bool QBattStats::checkDirExists()
+bool QBattStats::checkDirExists(QString path)
 {
-	return QDir(DEF_SYS_PATH).exists();
+	return QDir(path).exists();
 }
 
-QString QBattStats::getFileContents(QString f)
+QString QBattStats::getFileContents(QString fpath, QString fname)
 {
 	QString path;
 	QString result;
 
-	path.append(DEF_SYS_PATH);
+	if (!checkDirExists(fpath))
+		return RESPONSE_N_A;
+
+	path.append(fpath);
 	path.append('/');
-	path.append(f);
+	path.append(fname);
 
 	QFile file(path);
 
@@ -58,82 +65,83 @@ QString QBattStats::getFileContents(QString f)
 	return RESPONSE_N_A;
 }
 
-QString QBattStats::getCapacity()
+QString QBattStats::getStats(tPSUStat type)
 {
-	return (getFileContents(DEF_CAPACITY));
-}
-
-QString QBattStats::getCapacityLevel()
-{
-	return (getFileContents(DEF_CAPACITY_LEVEL));
-}
-
-QString QBattStats::getChargeFull()
-{
-	return (getFileContents(DEF_CHARGE_FULL));
-}
-
-QString QBattStats::getChargeFullDesign()
-{
-	return (getFileContents(DEF_CHARGE_FULL_DESIGN));
-}
-
-QString QBattStats::getChargeNow()
-{
-	return (getFileContents(DEF_CHARGE_NOW));
-}
-
-QString QBattStats::getCurrentNow()
-{
-	return (getFileContents(DEF_CURRENT_NOW));
-}
-
-QString QBattStats::getCycleCount()
-{
-	return (getFileContents(DEF_CYCLE_COUNT));
-}
-
-QString QBattStats::getManufacturer()
-{
-	return (getFileContents(DEF_MANUFACTURER));
-}
-
-QString QBattStats::getModelName()
-{
-	return (getFileContents(DEF_MODEL_NAME));
-}
-
-QString QBattStats::getPresent()
-{
-	return (getFileContents(DEF_PRESENT));
-}
-
-QString QBattStats::getSerialNumber()
-{
-	return (getFileContents(DEF_SERIAL_NUMBER));
-}
-
-QString QBattStats::getStatus()
-{
-	return (getFileContents(DEF_STATUS));
-}
-
-QString QBattStats::getTechnology()
-{
-	return (getFileContents(DEF_TECHNOLOGY));
-}
-
-QString QBattStats::getType()
-{
-	return (getFileContents(DEF_TYPE));
-}
-
-QString QBattStats::getVoltageMinDesign()
-{
-	return (getFileContents(DEF_VOLTAGE_MIN_DESIGN));
-}
-
-QString QBattStats::getVoltageNow()
-{
-	return (getFileContents(DEF_VOLTAGE_NOW));
+	switch (type) {
+		case BATT_CAPACITY:
+			return (getFileContents(DEF_SYS_PATH_BATT1,
+					DEF_BATT_CAPACITY));
+			break;
+		case BATT_CAPACITY_LEVEL:
+			return (getFileContents(DEF_SYS_PATH_BATT1,
+					DEF_BATT_CAPACITY_LEVEL));
+			break;
+		case BATT_CHARGE_FULL:
+			return (getFileContents(DEF_SYS_PATH_BATT1,
+					DEF_BATT_CHARGE_FULL));
+			break;
+		case BATT_CHARGE_FULL_DESIGN:
+			return (getFileContents(DEF_SYS_PATH_BATT1,
+					DEF_BATT_CHARGE_FULL_DESIGN));
+			break;
+		case BATT_CHARGE_NOW:
+			return (getFileContents(DEF_SYS_PATH_BATT1,
+					DEF_BATT_CHARGE_NOW));
+			break;
+		case BATT_CURRENT_NOW:
+			return (getFileContents(DEF_SYS_PATH_BATT1,
+					DEF_BATT_CURRENT_NOW));
+			break;
+		case BATT_CYCLE_COUNT:
+			return (getFileContents(DEF_SYS_PATH_BATT1,
+					DEF_BATT_CYCLE_COUNT));
+			break;
+		case BATT_MANUFACTURER:
+			return (getFileContents(DEF_SYS_PATH_BATT1,
+					DEF_BATT_MANUFACTURER));
+			break;
+		case BATT_MODEL_NAME:
+			return (getFileContents(DEF_SYS_PATH_BATT1,
+					DEF_BATT_MODEL_NAME));
+			break;
+		case BATT_PRESENT:
+			return (getFileContents(DEF_SYS_PATH_BATT1,
+					DEF_BATT_PRESENT));
+			break;
+		case BATT_SERIAL_NUMBER:
+			return (getFileContents(DEF_SYS_PATH_BATT1,
+					DEF_BATT_SERIAL_NUMBER));
+			break;
+		case BATT_STATUS:
+			return (getFileContents(DEF_SYS_PATH_BATT1,
+					DEF_BATT_STATUS));
+			break;
+		case BATT_TECHNOLOGY:
+			return (getFileContents(DEF_SYS_PATH_BATT1,
+					DEF_BATT_TECHNOLOGY));
+			break;
+		case BATT_TYPE:
+			return (getFileContents(DEF_SYS_PATH_BATT1,
+					DEF_BATT_TYPE));
+			break;
+		case BATT_VOLTAGE_MIN_DESIGN:
+			return (getFileContents(DEF_SYS_PATH_BATT1,
+					DEF_BATT_VOLTAGE_MIN_DESIGN));
+			break;
+		case BATT_VOLTAGE_NOW:
+			return (getFileContents(DEF_SYS_PATH_BATT1,
+					DEF_BATT_VOLTAGE_NOW));
+			break;
+		case ACAD_ONLINE:
+			return (getFileContents(DEF_SYS_PATH_ACAD,
+					DEF_ACAD_ONLINE));
+			break;
+		case ACAD_TYPE:
+			return (getFileContents(DEF_SYS_PATH_ACAD,
+					DEF_ACAD_TYPE));
+			break;
+		default:
+			return RESPONSE_N_A;
+			break;
+	}
 }

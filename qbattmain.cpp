@@ -42,21 +42,30 @@ QBattMain::~QBattMain()
 
 void QBattMain::updateTrayLabel()
 {
-	qint8 trayCapacity = stats->getCapacity().toInt();;
-	qint16 currentRate = stats->getCurrentNow().toInt() / 1000;
-	QString battStatus = stats->getStatus().trimmed();
+	qint8 trayCapacity = stats->getStats(stats->BATT_CAPACITY).toInt();
+	qint16 currentRate = stats->getStats(stats->BATT_CURRENT_NOW).toInt() / 1000;
+	QString battStatus = stats->getStats(stats->BATT_STATUS).trimmed();
+	bool adapterStatus = stats->getStats(stats->ACAD_ONLINE).toInt();
 
 	trayToolTipText.clear();
 
 	trayToolTipText.append("Status: ");
-	trayToolTipText.append(battStatus);
+	if ((!QString().compare(battStatus, BATT_STATUS_UNKNOWN)) and
+		(adapterStatus)) {
+		trayToolTipText.append("On-line");
+	} else {
+		trayToolTipText.append(battStatus);
+	}
 
 	trayText.clear();
 
 	if (trayCapacity == 100)
 		trayText.append("F");
 	else {
-		trayToolTipText.append(QString().sprintf("\nRate: %dmAh", currentRate));
+		if ((adapterStatus) and (currentRate != 0))
+			trayToolTipText.append(QString().sprintf("\nRate: %d mAh",
+													currentRate));
+
 		trayText.sprintf("%d", trayCapacity);
 	}
 

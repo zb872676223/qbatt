@@ -9,26 +9,37 @@ class QBattStats
 		QBattStats();
 
 	public:
-		bool checkDirExists();
-		QString getCapacity();
-		QString getCapacityLevel();
-		QString getChargeFull();
-		QString getChargeFullDesign();
-		QString getChargeNow();
-		QString getCurrentNow();
-		QString getCycleCount();
-		QString getManufacturer();
-		QString getModelName();
-		QString getPresent();
-		QString getSerialNumber();
-		QString getStatus();
-		QString getTechnology();
-		QString getType();
-		QString getVoltageMinDesign();
-		QString getVoltageNow();
+		typedef enum {
+			// Battery
+			BATT_CAPACITY,
+			BATT_CAPACITY_LEVEL,
+			BATT_CHARGE_FULL,
+			BATT_CHARGE_FULL_DESIGN,
+			BATT_CHARGE_NOW,
+			BATT_CURRENT_NOW,
+			BATT_CYCLE_COUNT,
+			BATT_MANUFACTURER,
+			BATT_MODEL_NAME,
+			BATT_PRESENT,
+			BATT_SERIAL_NUMBER,
+			BATT_STATUS,
+			BATT_TECHNOLOGY,
+			BATT_TYPE,
+			BATT_VOLTAGE_MIN_DESIGN,
+			BATT_VOLTAGE_NOW,
+			// ACAD
+			ACAD_ONLINE,
+			ACAD_TYPE
+		} tPSUStat;
+
+	public:
+		QString getStats(tPSUStat type);
 
 	private:
-		QString getFileContents(QString f);
+		bool checkDirExists(QString path);
+		QString getFileContents(QString fpath, QString fname);
 };
+
+static const QString BATT_STATUS_UNKNOWN = "Unknown";
 
 #endif // QBATTSTATS_H
