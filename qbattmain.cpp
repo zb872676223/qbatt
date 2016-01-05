@@ -62,9 +62,13 @@ void QBattMain::updateTrayLabel()
 	if (trayCapacity == 100)
 		trayText.append("F");
 	else {
-		if ((!adapterStatus) and (currentRate != 0))
+		if ((!QString().compare(battStatus, BATT_STATUS_CHARGING)) or
+			(!QString().compare(battStatus, BATT_STATUS_DISCHARGING))) {
 			trayToolTipText.append(QString().sprintf("\nRate: %d mAh",
 													currentRate));
+			trayToolTipText.append("\nTime left: ");
+			trayToolTipText.append(stats->getTimeLeft());
+		}
 
 		trayText.sprintf("%d", trayCapacity);
 	}
@@ -87,8 +91,9 @@ void QBattMain::updateTrayLabel()
 void QBattMain::exitApplication(QSystemTrayIcon::ActivationReason reason)
 {
 	if (reason == QSystemTrayIcon::DoubleClick) {
-		QMessageBox *msg = new QMessageBox(QMessageBox::Information, "Exit qbatt:", "Do you really want to exit?",
-			QMessageBox::Yes | QMessageBox::Cancel, NULL);
+		QMessageBox *msg = new QMessageBox(QMessageBox::Information,
+								"Exit qbatt:", "Do you really want to exit?",
+								QMessageBox::Yes | QMessageBox::Cancel, NULL);
 
 		int ret = msg->exec();
 		delete msg;

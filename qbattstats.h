@@ -34,12 +34,15 @@ class QBattStats
 
 	public:
 		QString getStats(tPSUStat type);
+		QString getTimeLeft();
 
 	private:
 		bool checkDirExists(QString path);
 		QString getFileContents(QString fpath, QString fname);
 };
 
-static const QString BATT_STATUS_UNKNOWN = "Unknown";
+static const QString BATT_STATUS_UNKNOWN		= "Unknown";
+static const QString BATT_STATUS_DISCHARGING	= "Discharging";
+static const QString BATT_STATUS_CHARGING		= "Charging";
 
 #endif // QBATTSTATS_H

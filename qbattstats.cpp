@@ -145,3 +145,48 @@ QString QBattStats::getStats(tPSUStat type)
 			break;
 	}
 }
+
+QString QBattStats::getTimeLeft()
+{
+	int hours = -1;
+	int minutes = -1;
+	int seconds = -1;
+	int remainingCapacity = -1;
+	int lastCapacity = -1;
+	int current = -1;
+
+	QString ret;
+
+	current = getStats(BATT_CURRENT_NOW).toInt() / 1000;
+	remainingCapacity = getStats(BATT_CHARGE_NOW).toInt() / 1000;
+	lastCapacity = getStats(BATT_CHARGE_FULL).toInt() / 1000;
+
+	/*
+	 * This idea has been taken from acpi utility by
+	 * Grahame Bowland <grahame@angrygoats.net> and
+	 * Michael Meskes  <meskes@debian.org>
+	 */
+	if (current > 0) {
+		if (!QString().compare(getStats(BATT_STATUS).trimmed(),
+								BATT_STATUS_CHARGING))
+			seconds = 3600 * (lastCapacity - remainingCapacity) / current;
+		else if (!QString().compare(getStats(BATT_STATUS).trimmed(),
+								BATT_STATUS_DISCHARGING))
+			seconds = 3600 * remainingCapacity / current;
+	}
+
+	ret.clear();
+
+	if (seconds > 0) {
+		hours = seconds / 3600;
+		seconds -= 3600 * hours;
+		minutes = seconds / 60;
+		seconds -= 60 * minutes;
+
+		ret.sprintf("%02d:%02d h", hours, minutes);
+	} else {
+		ret.append("n/a");
+	}
+
+	return ret;
+}
