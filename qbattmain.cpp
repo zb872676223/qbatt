@@ -20,13 +20,13 @@ QBattMain::QBattMain(QWidget *parent) :
 	stats = new QBattStats();
 
 	trayTimer = new QTimer(this);
-	trayTimer->setInterval(1000);
+	trayTimer->setInterval(3000);
 	trayTimer->start();
 
 	QObject::connect(trayTimer, SIGNAL(timeout()),
-			this, SLOT(updateTrayLabel()));
+					 this, SLOT(updateTrayLabel()));
 	QObject::connect(trayIcon, SIGNAL(activated(QSystemTrayIcon::ActivationReason)),
-			this, SLOT(exitApplication(QSystemTrayIcon::ActivationReason)));
+					 this, SLOT(exitApplication(QSystemTrayIcon::ActivationReason)));
 }
 
 QBattMain::~QBattMain()
@@ -42,16 +42,18 @@ QBattMain::~QBattMain()
 
 void QBattMain::updateTrayLabel()
 {
-	qint8 trayCapacity = stats->getStats(stats->BATT_CAPACITY).toInt();
-	qint16 currentRate = stats->getStats(stats->BATT_CURRENT_NOW).toInt() / 1000;
-	QString battStatus = stats->getStats(stats->BATT_STATUS).trimmed();
-	bool adapterStatus = stats->getStats(stats->ACAD_ONLINE).toInt();
+	// Update PSU information first
+	stats->updatePowerSupplyInfo();
+	qint8 trayCapacity = stats->getBatteryCapacity();
+	qint16 currentRate = stats->getBatteryCurrentNow() / 1000;
+	QString battStatus = stats->getBatteryStatus();
+	bool adapterStatus = stats->getACOnline();
 
 	trayToolTipText.clear();
 
 	trayToolTipText.append("Status: ");
 	if ((!QString().compare(battStatus, BATT_STATUS_UNKNOWN)) and
-		(adapterStatus)) {
+			(adapterStatus)) {
 		trayToolTipText.append("On-line");
 	} else {
 		trayToolTipText.append(battStatus);
@@ -63,9 +65,9 @@ void QBattMain::updateTrayLabel()
 		trayText.append("F");
 	else {
 		if ((!QString().compare(battStatus, BATT_STATUS_CHARGING)) or
-			(!QString().compare(battStatus, BATT_STATUS_DISCHARGING))) {
+				(!QString().compare(battStatus, BATT_STATUS_DISCHARGING))) {
 			trayToolTipText.append(QString().sprintf("\nRate: %d mAh",
-													currentRate));
+													 currentRate));
 			trayToolTipText.append("\nTime left: ");
 			trayToolTipText.append(stats->getTimeLeft());
 		}
@@ -92,25 +94,25 @@ void QBattMain::exitApplication(QSystemTrayIcon::ActivationReason reason)
 {
 	if (reason == QSystemTrayIcon::DoubleClick) {
 		QMessageBox *msg = new QMessageBox(QMessageBox::Information,
-								"Exit qbatt:", "Do you really want to exit?",
-								QMessageBox::Yes | QMessageBox::Cancel, NULL);
+										   "Exit qbatt:", "Do you really want to exit?",
+										   QMessageBox::Yes | QMessageBox::Cancel, NULL);
 
 		int ret = msg->exec();
 		delete msg;
 
 		switch (ret) {
-			case QMessageBox::Yes:
-				// Stop the timer
-				trayTimer->stop();
-				// Release memory
-				delete stats;
-				delete trayTimer;
-				delete trayIcon;
+		case QMessageBox::Yes:
+			// Stop the timer
+			trayTimer->stop();
+			// Release memory
+			delete stats;
+			delete trayTimer;
+			delete trayIcon;
 
-				exit(0);
-				break;
-			case QMessageBox::Cancel:
-				break;
+			exit(0);
+			break;
+		case QMessageBox::Cancel:
+			break;
 		}
 	}
 
