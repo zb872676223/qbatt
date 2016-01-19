@@ -8,27 +8,27 @@
 
 class QBattMain : public QMainWindow
 {
-		Q_OBJECT
+	Q_OBJECT
 
-	public:
-		explicit QBattMain(QWidget *parent = 0);
-		~QBattMain();
+public:
+	explicit QBattMain(QWidget *parent = 0);
+	~QBattMain();
 
-	private:
-		QBattStats *stats;
-		QTimer *trayTimer;
-		QSystemTrayIcon *trayIcon;
+private:
+	QBattStats *stats;
+	QTimer *trayTimer;
+	QSystemTrayIcon *trayIcon;
 
-	private:
-		QString trayText;
-		QString trayToolTipText;
-		QFont trayFont;
-		QPixmap trayPixmap;
-		QPainter *trayPainter;
+private:
+	QString trayText;
+	QString trayToolTipText;
+	QFont trayFont;
+	QPixmap trayPixmap;
+	QPainter *trayPainter;
 
-	private slots:
-		void updateTrayLabel();
-		void exitApplication(QSystemTrayIcon::ActivationReason reason);
+private slots:
+	void updateTrayLabel();
+	void exitApplication(QSystemTrayIcon::ActivationReason reason);
 };
 
 #endif // QBATTMAIN_H

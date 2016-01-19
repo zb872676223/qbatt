@@ -14,9 +14,12 @@ TEMPLATE = app
 
 SOURCES += main.cpp\
         qbattmain.cpp \
-    qbattstats.cpp
+    qbattstats.cpp \
+    qbattsysfsmethod.cpp
 
 HEADERS  += qbattmain.h \
-    qbattstats.h
+    qbattstats.h \
+    qbattsysfsmethod.h \
+    qbattpsu.h
 
 FORMS    +=

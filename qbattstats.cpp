@@ -2,138 +2,156 @@
 #include <QDir>
 #include <QDebug>
 #include "qbattstats.h"
-
-#define DEF_CAPACITY			"capacity"
-#define DEF_CAPACITY_LEVEL		"capacity_level"
-#define DEF_CHARGE_FULL			"charge_full"
-#define DEF_CHARGE_FULL_DESIGN	"charge_full_design"
-#define DEF_CHARGE_NOW			"charge_now"
-#define DEF_CURRENT_NOW			"current_now"
-#define DEF_CYCLE_COUNT			"cycle_count"
-#define DEF_MANUFACTURER		"manufacturer"
-#define DEF_MODEL_NAME			"model_name"
-#define DEF_PRESENT				"present"
-#define DEF_SERIAL_NUMBER		"serial_number"
-#define DEF_STATUS				"status"
-#define DEF_TECHNOLOGY			"technology"
-#define DEF_TYPE				"type"
-#define DEF_VOLTAGE_MIN_DESIGN	"voltage_min_design"
-#define DEF_VOLTAGE_NOW			"voltage_now"
-
-#define DEF_SYS_PATH			"/sys/class/power_supply/BAT1"
-#define RESPONSE_N_A			"n/a"
+#include "qbattsysfsmethod.h"
 
 QBattStats::QBattStats()
 {
+	sysfs_method = new QBattSysFSMethod(&this->psu);
 
+	sysfs_method->initPowerSupply();
 }
 
-bool QBattStats::checkDirExists()
+QBattStats::~QBattStats()
 {
-	return QDir(DEF_SYS_PATH).exists();
+	delete sysfs_method;
 }
 
-QString QBattStats::getFileContents(QString f)
+void QBattStats::updatePowerSupplyInfo()
 {
-	QString path;
-	QString result;
+	sysfs_method->updatePowerSupply();
+}
 
-	path.append(DEF_SYS_PATH);
-	path.append('/');
-	path.append(f);
+int QBattStats::getBatteryCapacity()
+{
+	return psu.battery.psu_capacity;
+}
 
-	QFile file(path);
+QString QBattStats::getBatteryCapacityLevel()
+{
+	return psu.battery.psu_capacity_level;
+}
 
-	if (file.open(QIODevice::ReadOnly)) {
-		char buf[256];
-		qint64 lineLength = file.readLine(buf, sizeof(buf));
-		if (lineLength != -1) {
-			result = QString(buf);
+int QBattStats::getBatteryChargeFull()
+{
+	return psu.battery.psu_charge_full;
+}
 
-			file.close();
-			return result;
-		}
+int QBattStats::getBatteryChargeFullDesign()
+{
+	return psu.battery.psu_charge_full_design;
+}
+
+int QBattStats::getBatteryChargeNow()
+{
+	return psu.battery.psu_charge_now;
+}
+
+int QBattStats::getBatteryCurrentNow()
+{
+	return psu.battery.psu_current_now;
+}
+
+int QBattStats::getBatteryCycleCount()
+{
+	return psu.battery.psu_cycle_count;
+}
+
+QString QBattStats::getBatteryManufacturer()
+{
+	return psu.battery.psu_manufacturer;
+}
+
+QString QBattStats::getBatteryModelName()
+{
+	return psu.battery.psu_model_name;
+}
+
+int QBattStats::getBatteryPresent()
+{
+	return psu.battery.psu_present;
+}
+
+QString QBattStats::getBatterySerialNumber()
+{
+	return psu.battery.psu_serial_number;
+}
+
+QString QBattStats::getBatteryStatus()
+{
+	return psu.battery.psu_status;
+}
+
+QString QBattStats::getBatteryTechnology()
+{
+	return psu.battery.psu_technology;
+}
+
+QString QBattStats::getBatteryType()
+{
+	return psu.battery.psu_type;
+}
+
+int QBattStats::getBatteryVoltageMinDesign()
+{
+	return psu.battery.psu_voltage_min_design;
+}
+
+int QBattStats::getBatteryVoltageNow()
+{
+	return psu.battery.psu_voltage_now;
+}
+
+int QBattStats::getACOnline()
+{
+	return psu.ac_adapter.online;
+}
+
+QString QBattStats::getACType()
+{
+	return psu.ac_adapter.psu_name;
+}
+
+QString QBattStats::getTimeLeft()
+{
+	int hours = -1;
+	int minutes = -1;
+	int seconds = -1;
+	int remainingCapacity = -1;
+	int lastCapacity = -1;
+	int current = -1;
+
+	QString ret;
+
+	current = psu.battery.psu_current_now / 1000;
+	remainingCapacity = psu.battery.psu_charge_now / 1000;
+	lastCapacity = psu.battery.psu_charge_full / 1000;
+
+	/*
+	 * This idea has been taken from acpi utility by
+	 * Grahame Bowland <grahame@angrygoats.net> and
+	 * Michael Meskes  <meskes@debian.org>
+	 */
+	if (current > 0) {
+		if (!QString().compare(psu.battery.psu_status,
+							   BATT_STATUS_CHARGING))
+			seconds = 3600 * (lastCapacity - remainingCapacity) / current;
+		else if (!QString().compare(psu.battery.psu_status,
+									BATT_STATUS_DISCHARGING))
+			seconds = 3600 * remainingCapacity / current;
 	}
 
-	return RESPONSE_N_A;
-}
+	ret.clear();
 
-QString QBattStats::getCapacity()
-{
-	return (getFileContents(DEF_CAPACITY));
-}
+	if (seconds > 0) {
+		hours = seconds / 3600;
+		seconds -= 3600 * hours;
+		minutes = seconds / 60;
+		seconds -= 60 * minutes;
 
-QString QBattStats::getCapacityLevel()
-{
-	return (getFileContents(DEF_CAPACITY_LEVEL));
-}
+		ret.sprintf("%02d:%02d h", hours, minutes);
+	} else {
+		ret.append("n/a");
+	}
 
-QString QBattStats::getChargeFull()
-{
-	return (getFileContents(DEF_CHARGE_FULL));
-}
-
-QString QBattStats::getChargeFullDesign()
-{
-	return (getFileContents(DEF_CHARGE_FULL_DESIGN));
-}
-
-QString QBattStats::getChargeNow()
-{
-	return (getFileContents(DEF_CHARGE_NOW));
-}
-
-QString QBattStats::getCurrentNow()
-{
-	return (getFileContents(DEF_CURRENT_NOW));
-}
-
-QString QBattStats::getCycleCount()
-{
-	return (getFileContents(DEF_CYCLE_COUNT));
-}
-
-QString QBattStats::getManufacturer()
-{
-	return (getFileContents(DEF_MANUFACTURER));
-}
-
-QString QBattStats::getModelName()
-{
-	return (getFileContents(DEF_MODEL_NAME));
-}
-
-QString QBattStats::getPresent()
-{
-	return (getFileContents(DEF_PRESENT));
-}
-
-QString QBattStats::getSerialNumber()
-{
-	return (getFileContents(DEF_SERIAL_NUMBER));
-}
-
-QString QBattStats::getStatus()
-{
-	return (getFileContents(DEF_STATUS));
-}
-
-QString QBattStats::getTechnology()
-{
-	return (getFileContents(DEF_TECHNOLOGY));
-}
-
-QString QBattStats::getType()
-{
-	return (getFileContents(DEF_TYPE));
-}
-
-QString QBattStats::getVoltageMinDesign()
-{
-	return (getFileContents(DEF_VOLTAGE_MIN_DESIGN));
-}
-
-QString QBattStats::getVoltageNow()
-{
-	return (getFileContents(DEF_VOLTAGE_NOW));
+	return ret;
 }

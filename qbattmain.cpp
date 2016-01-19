@@ -20,13 +20,13 @@ QBattMain::QBattMain(QWidget *parent) :
 	stats = new QBattStats();
 
 	trayTimer = new QTimer(this);
-	trayTimer->setInterval(1000);
+	trayTimer->setInterval(3000);
 	trayTimer->start();
 
 	QObject::connect(trayTimer, SIGNAL(timeout()),
-			this, SLOT(updateTrayLabel()));
+					 this, SLOT(updateTrayLabel()));
 	QObject::connect(trayIcon, SIGNAL(activated(QSystemTrayIcon::ActivationReason)),
-			this, SLOT(exitApplication(QSystemTrayIcon::ActivationReason)));
+					 this, SLOT(exitApplication(QSystemTrayIcon::ActivationReason)));
 }
 
 QBattMain::~QBattMain()
@@ -42,21 +42,42 @@ QBattMain::~QBattMain()
 
 void QBattMain::updateTrayLabel()
 {
-	qint8 trayCapacity = stats->getCapacity().toInt();;
-	qint16 currentRate = stats->getCurrentNow().toInt() / 1000;
-	QString battStatus = stats->getStatus().trimmed();
+	// Update PSU information first
+	stats->updatePowerSupplyInfo();
+	qint8 trayCapacity = stats->getBatteryCapacity();
+	qint16 currentRate = stats->getBatteryCurrentNow() / 1000;
+	QString battStatus = stats->getBatteryStatus();
+	bool adapterStatus = stats->getACOnline();
 
 	trayToolTipText.clear();
 
 	trayToolTipText.append("Status: ");
-	trayToolTipText.append(battStatus);
+	if ((!QString().compare(battStatus, BATT_STATUS_UNKNOWN)) and
+			(adapterStatus)) {
+		trayToolTipText.append("On-line");
+	} else {
+		trayToolTipText.append(battStatus);
+	}
 
 	trayText.clear();
 
-	if (trayCapacity == 100)
+	if (trayCapacity >= 100) {
+		/*
+		 * Capacity value might be greater than 100% when
+		 * the battery has accumulated greater energy amount
+		 * at its last charge in compare to its previous charge.
+		 * So just show that it's completely charged.
+		 */
 		trayText.append("F");
-	else {
-		trayToolTipText.append(QString().sprintf("\nRate: %dmAh", currentRate));
+	} else {
+		if ((!QString().compare(battStatus, BATT_STATUS_CHARGING)) or
+				(!QString().compare(battStatus, BATT_STATUS_DISCHARGING))) {
+			trayToolTipText.append(QString().sprintf("\nRate: %d mAh",
+													 currentRate));
+			trayToolTipText.append("\nTime left: ");
+			trayToolTipText.append(stats->getTimeLeft());
+		}
+
 		trayText.sprintf("%d", trayCapacity);
 	}
 
@@ -78,25 +99,26 @@ void QBattMain::updateTrayLabel()
 void QBattMain::exitApplication(QSystemTrayIcon::ActivationReason reason)
 {
 	if (reason == QSystemTrayIcon::DoubleClick) {
-		QMessageBox *msg = new QMessageBox(QMessageBox::Information, "Exit qbatt:", "Do you really want to exit?",
-			QMessageBox::Yes | QMessageBox::Cancel, NULL);
+		QMessageBox *msg = new QMessageBox(QMessageBox::Information,
+										   "Exit qbatt:", "Do you really want to exit?",
+										   QMessageBox::Yes | QMessageBox::Cancel, NULL);
 
 		int ret = msg->exec();
 		delete msg;
 
 		switch (ret) {
-			case QMessageBox::Yes:
-				// Stop the timer
-				trayTimer->stop();
-				// Release memory
-				delete stats;
-				delete trayTimer;
-				delete trayIcon;
+		case QMessageBox::Yes:
+			// Stop the timer
+			trayTimer->stop();
+			// Release memory
+			delete stats;
+			delete trayTimer;
+			delete trayIcon;
 
-				exit(0);
-				break;
-			case QMessageBox::Cancel:
-				break;
+			exit(0);
+			break;
+		case QMessageBox::Cancel:
+			break;
 		}
 	}
 
