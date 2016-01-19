@@ -61,9 +61,15 @@ void QBattMain::updateTrayLabel()
 
 	trayText.clear();
 
-	if (trayCapacity == 100)
+	if (trayCapacity >= 100) {
+		/*
+		 * Capacity value might be greater than 100% when
+		 * the battery has accumulated greater energy amount
+		 * at its last charge in compare to its previous charge.
+		 * So just show that it's completely charged.
+		 */
 		trayText.append("F");
-	else {
+	} else {
 		if ((!QString().compare(battStatus, BATT_STATUS_CHARGING)) or
 				(!QString().compare(battStatus, BATT_STATUS_DISCHARGING))) {
 			trayToolTipText.append(QString().sprintf("\nRate: %d mAh",
