@@ -23,6 +23,10 @@ typedef struct _batt_info {
 	int			psu_charge_full;
 	int			psu_charge_now;
 	int			psu_capacity;
+	int			psu_energy_full;
+	int			psu_energy_full_design;
+	int			psu_energy_now;
+	int			psu_power_now;
 	QString		psu_capacity_level;
 	QString		psu_model_name;
 	QString		psu_manufacturer;

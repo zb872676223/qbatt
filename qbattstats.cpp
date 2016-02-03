@@ -56,6 +56,21 @@ int QBattStats::getBatteryCycleCount()
 	return psu.battery.psu_cycle_count;
 }
 
+int QBattStats::getBatteryEnergyFull()
+{
+	return psu.battery.psu_energy_full;
+}
+
+int QBattStats::getBatteryEnergyFullDesign()
+{
+	return psu.battery.psu_energy_full_design;
+}
+
+int QBattStats::getBatteryEnergyNow()
+{
+	return psu.battery.psu_energy_now;
+}
+
 QString QBattStats::getBatteryManufacturer()
 {
 	return psu.battery.psu_manufacturer;
@@ -64,6 +79,11 @@ QString QBattStats::getBatteryManufacturer()
 QString QBattStats::getBatteryModelName()
 {
 	return psu.battery.psu_model_name;
+}
+
+int QBattStats::getBatteryPowerNow()
+{
+	return psu.battery.psu_power_now;
 }
 
 int QBattStats::getBatteryPresent()
@@ -119,23 +139,29 @@ QString QBattStats::getTimeLeft()
 	int remainingCapacity = -1;
 	int lastCapacity = -1;
 	int current = -1;
-
+	int tmp_current = -1;
+	QString battery_status;
 	QString ret;
 
-	current = psu.battery.psu_current_now / 1000;
-	remainingCapacity = psu.battery.psu_charge_now / 1000;
-	lastCapacity = psu.battery.psu_charge_full / 1000;
+	tmp_current = getBatteryCurrentNow();
+	if (tmp_current != -1)
+		current = tmp_current / 1000;
+	else
+		current = (getBatteryPowerNow() / (getBatteryVoltageNow() / 1000));
 
+	remainingCapacity = getBatteryChargeNow() / 1000;
+	lastCapacity = getBatteryChargeFull() / 1000;
+	battery_status = getBatteryStatus();
 	/*
 	 * This idea has been taken from acpi utility by
 	 * Grahame Bowland <grahame@angrygoats.net> and
 	 * Michael Meskes  <meskes@debian.org>
 	 */
 	if (current > 0) {
-		if (!QString().compare(psu.battery.psu_status,
+		if (!QString().compare(battery_status,
 							   BATT_STATUS_CHARGING))
 			seconds = 3600 * (lastCapacity - remainingCapacity) / current;
-		else if (!QString().compare(psu.battery.psu_status,
+		else if (!QString().compare(battery_status,
 									BATT_STATUS_DISCHARGING))
 			seconds = 3600 * remainingCapacity / current;
 	}
