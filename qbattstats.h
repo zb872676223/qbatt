@@ -20,8 +20,12 @@ public:
 	int			getBatteryChargeNow();
 	int			getBatteryCurrentNow();
 	int			getBatteryCycleCount();
+	int			getBatteryEnergyFull();
+	int			getBatteryEnergyFullDesign();
+	int			getBatteryEnergyNow();
 	QString		getBatteryManufacturer();
 	QString		getBatteryModelName();
+	int			getBatteryPowerNow();
 	int			getBatteryPresent();
 	QString		getBatterySerialNumber();
 	QString		getBatteryStatus();
