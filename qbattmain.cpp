@@ -43,11 +43,17 @@ QBattMain::~QBattMain()
 void QBattMain::updateTrayLabel()
 {
 	// Update PSU information first
+	int currentRate = -1;
 	stats->updatePowerSupplyInfo();
-	qint8 trayCapacity = stats->getBatteryCapacity();
-	qint16 currentRate = stats->getBatteryCurrentNow() / 1000;
+	int trayCapacity = stats->getBatteryCapacity();
 	QString battStatus = stats->getBatteryStatus();
 	bool adapterStatus = stats->getACOnline();
+
+	currentRate = stats->getBatteryCurrentNow();
+	if (currentRate != -1)
+		currentRate /= 1000;
+	else
+		currentRate = (stats->getBatteryPowerNow() / (stats->getBatteryVoltageNow() / 1000));
 
 	trayToolTipText.clear();
 
