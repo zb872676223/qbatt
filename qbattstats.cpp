@@ -153,13 +153,13 @@ QString QBattStats::getTimeLeft()
 	if (tmp != -1)
 		remainingCapacity = tmp / 1000;
 	else
-		remainingCapacity = getBatteryEnergyNow() / 1000;
+		remainingCapacity = (getBatteryEnergyNow() / (getBatteryVoltageNow() / 1000));
 
 	tmp = getBatteryChargeFull();
 	if (tmp != -1)
 		lastCapacity = tmp / 1000;
 	else
-		lastCapacity = getBatteryEnergyFull() / 1000;
+		lastCapacity = (getBatteryEnergyFull() / (getBatteryVoltageNow() / 1000));
 
 	battery_status = getBatteryStatus();
 	/*
