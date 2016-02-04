@@ -139,25 +139,24 @@ QString QBattStats::getTimeLeft()
 	int remainingCapacity = -1;
 	int lastCapacity = -1;
 	int current = -1;
-	int tmp = -1;
 	QString battery_status;
 	QString ret;
 
-	tmp = getBatteryCurrentNow();
-	if (tmp != -1)
-		current = tmp / 1000;
+	current = getBatteryCurrentNow();
+	if (current != -1)
+		current /= 1000;
 	else
 		current = (getBatteryPowerNow() / (getBatteryVoltageNow() / 1000));
 
-	tmp = getBatteryChargeNow();
-	if (tmp != -1)
-		remainingCapacity = tmp / 1000;
+	remainingCapacity = getBatteryChargeNow();
+	if (remainingCapacity != -1)
+		remainingCapacity /= 1000;
 	else
 		remainingCapacity = (getBatteryEnergyNow() / (getBatteryVoltageNow() / 1000));
 
-	tmp = getBatteryChargeFull();
-	if (tmp != -1)
-		lastCapacity = tmp / 1000;
+	lastCapacity = getBatteryChargeFull();
+	if (lastCapacity != -1)
+		lastCapacity /= 1000;
 	else
 		lastCapacity = (getBatteryEnergyFull() / (getBatteryVoltageNow() / 1000));
 
