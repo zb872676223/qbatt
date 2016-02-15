@@ -6,6 +6,33 @@
 
 QBattStats::QBattStats()
 {
+	// Init ACAD's fields
+	this->psu.ac_adapter.online					= -1;
+	this->psu.ac_adapter.path					= "";
+	this->psu.ac_adapter.psu_name				= "";
+	// Init battery's fields
+	this->psu.battery.path						= "";
+	this->psu.battery.psu_capacity				= -1;
+	this->psu.battery.psu_capacity_level		= "";
+	this->psu.battery.psu_charge_full			= -1;
+	this->psu.battery.psu_charge_full_design	= -1;
+	this->psu.battery.psu_charge_now			= -1;
+	this->psu.battery.psu_current_now			= -1;
+	this->psu.battery.psu_cycle_count			= -1;
+	this->psu.battery.psu_energy_full			= -1;
+	this->psu.battery.psu_energy_full_design	= -1;
+	this->psu.battery.psu_energy_now			= -1;
+	this->psu.battery.psu_manufacturer			= "";
+	this->psu.battery.psu_model_name			= "";
+	this->psu.battery.psu_power_now				= -1;
+	this->psu.battery.psu_present				= -1;
+	this->psu.battery.psu_serial_number			= "";
+	this->psu.battery.psu_status				= "";
+	this->psu.battery.psu_technology			= "";
+	this->psu.battery.psu_type					= "";
+	this->psu.battery.psu_voltage_min_design	= -1;
+	this->psu.battery.psu_voltage_now			= -1;
+
 	sysfs_method = new QBattSysFSMethod(&this->psu);
 
 	sysfs_method->initPowerSupply();
