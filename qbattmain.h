@@ -4,6 +4,7 @@
 #include <QMainWindow>
 #include <QSystemTrayIcon>
 #include <QMessageBox>
+#include "qbatttray_t.h"
 #include "qbattstats.h"
 
 class QBattMain : public QMainWindow
@@ -17,8 +18,8 @@ public:
 private:
 	QBattStats *stats;
 	QTimer *trayTimer;
-	QSystemTrayIcon *trayIcon;
 
+  QBattTray_T *trayIcon;
 private:
 	QString trayText;
 	QString trayToolTipText;
