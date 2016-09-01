@@ -95,8 +95,8 @@ void QBattMain::updateTrayLabel()
 
 	if ((stats->getBatteryChargeFull() != 0) &&
 		(stats->getBatteryChargeFullDesign() != 0)) {
-		battery_health = (stats->getBatteryChargeFull() * 100) /
-						stats->getBatteryChargeFullDesign();
+		battery_health = (stats->getBatteryChargeFull() * 100.0) /
+						stats->getBatteryChargeFullDesign() * 1.0;
 		trayToolTipText.append(QString().sprintf("\nHealth: %.1f%%",
 						battery_health));
 	}
