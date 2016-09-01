@@ -14,8 +14,7 @@ QBattMain::QBattMain(QWidget *parent) :
 	trayPixmap = QPixmap(16, 16);
 	trayPixmap.fill(Qt::white);
 
-	trayIcon = new QSystemTrayIcon(this);
-	trayIcon->setVisible(false);
+  trayIcon = new QBattTray_T (this);
 
 	stats = new QBattStats();
 
@@ -25,8 +24,10 @@ QBattMain::QBattMain(QWidget *parent) :
 
 	QObject::connect(trayTimer, SIGNAL(timeout()),
 					 this, SLOT(updateTrayLabel()));
-	QObject::connect(trayIcon, SIGNAL(activated(QSystemTrayIcon::ActivationReason)),
-					 this, SLOT(exitApplication(QSystemTrayIcon::ActivationReason)));
+
+  QObject::connect(trayIcon->getSystemTray (), SIGNAL(activated(QSystemTrayIcon::ActivationReason)),
+           this, SLOT(exitApplication(QSystemTrayIcon::ActivationReason)));
+
 }
 
 QBattMain::~QBattMain()
@@ -46,8 +47,10 @@ void QBattMain::updateTrayLabel()
 	int currentRate = -1;
 	stats->updatePowerSupplyInfo();
 	int trayCapacity = stats->getBatteryCapacity();
+  trayIcon->batteryLevelChanged (trayCapacity);
 	QString battStatus = stats->getBatteryStatus();
 	bool adapterStatus = stats->getACOnline();
+  trayIcon->batteryStatusChanged (adapterStatus);
 
 	currentRate = stats->getBatteryCurrentNow();
 	if (currentRate != -1)
@@ -93,11 +96,9 @@ void QBattMain::updateTrayLabel()
 	trayPainter->setFont(trayFont);
 
 	trayPainter->eraseRect(trayPixmap.rect());
-	trayPainter->drawText(trayPixmap.rect(), Qt::AlignCenter, trayText);
-	trayIcon->setIcon(trayPixmap);
+  trayPainter->drawText(trayPixmap.rect(), Qt::AlignCenter, trayText);
 
-	trayIcon->setToolTip(trayToolTipText);
-	trayIcon->setVisible(true);
+  trayIcon->getSystemTray ()->setToolTip(trayToolTipText);
 
 	delete trayPainter;
 }

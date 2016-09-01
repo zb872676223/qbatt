@@ -15,11 +15,18 @@ TEMPLATE = app
 SOURCES += main.cpp\
         qbattmain.cpp \
     qbattstats.cpp \
-    qbattsysfsmethod.cpp
+    qbattsysfsmethod.cpp \
+    qbatticon_t.cpp \
+    qbatttray_t.cpp
 
 HEADERS  += qbattmain.h \
     qbattstats.h \
     qbattsysfsmethod.h \
-    qbattpsu.h
+    qbattpsu.h \
+    qbatticon_t.h \
+    qbatttray_t.h
 
 FORMS    +=
+
+RESOURCES += \
+    icons.qrc
