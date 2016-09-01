@@ -14,7 +14,7 @@ QBattMain::QBattMain(QWidget *parent) :
 	trayPixmap = QPixmap(16, 16);
 	trayPixmap.fill(Qt::white);
 
-  trayIcon = new QBattTray_T (this);
+	trayIcon = new QBattTray_T (this);
 
 	stats = new QBattStats();
 
@@ -45,12 +45,13 @@ void QBattMain::updateTrayLabel()
 {
 	// Update PSU information first
 	int currentRate = -1;
+	float battery_health = 0.0;
 	stats->updatePowerSupplyInfo();
 	int trayCapacity = stats->getBatteryCapacity();
-  trayIcon->batteryLevelChanged (trayCapacity);
+	trayIcon->batteryLevelChanged(trayCapacity);
 	QString battStatus = stats->getBatteryStatus();
 	bool adapterStatus = stats->getACOnline();
-  trayIcon->batteryStatusChanged (adapterStatus);
+	trayIcon->batteryStatusChanged (adapterStatus);
 
 	currentRate = stats->getBatteryCurrentNow();
 	if (currentRate != -1)
@@ -92,13 +93,21 @@ void QBattMain::updateTrayLabel()
 
 	trayToolTipText.append(QString().sprintf("\nCapacity: %d%%", trayCapacity));
 
+	if ((stats->getBatteryChargeFull() != 0) &&
+		(stats->getBatteryChargeFullDesign() != 0)) {
+		battery_health = (stats->getBatteryChargeFull() * 100) /
+						stats->getBatteryChargeFullDesign();
+		trayToolTipText.append(QString().sprintf("\nHealth: %.1f%%",
+						battery_health));
+	}
+
 	trayPainter = new QPainter(&trayPixmap);
 	trayPainter->setFont(trayFont);
 
 	trayPainter->eraseRect(trayPixmap.rect());
-  trayPainter->drawText(trayPixmap.rect(), Qt::AlignCenter, trayText);
+	trayPainter->drawText(trayPixmap.rect(), Qt::AlignCenter, trayText);
 
-  trayIcon->getSystemTray ()->setToolTip(trayToolTipText);
+	trayIcon->getSystemTray ()->setToolTip(trayToolTipText);
 
 	delete trayPainter;
 }
