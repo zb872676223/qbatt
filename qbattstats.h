@@ -4,6 +4,12 @@
 #include <QString>
 #include "qbattpsu.h"
 #include "qbattsysfsmethod.h"
+#include "qbattdbusmethod.h"
+
+typedef enum {
+    METHOD_SYSFS,
+    METHOD_DBUS
+} tMethod;
 
 class QBattStats
 {
@@ -38,7 +44,9 @@ public:
 	QString		getTimeLeft();
 
 private:
-	QBattSysFSMethod *sysfs_method;
+    QBattSysFSMethod *sysfs_method;
+    QBattDBusMethod *dbus_method;
+    tMethod method;
 
 private:
 	psuinfo_t	psu;

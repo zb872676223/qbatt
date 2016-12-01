@@ -3,6 +3,7 @@
 #include <QDebug>
 #include "qbattstats.h"
 #include "qbattsysfsmethod.h"
+#include "qbattdbusmethod.h"
 
 QBattStats::QBattStats()
 {
@@ -33,19 +34,33 @@ QBattStats::QBattStats()
 	this->psu.battery.psu_voltage_min_design	= -1;
 	this->psu.battery.psu_voltage_now			= -1;
 
-	sysfs_method = new QBattSysFSMethod(&this->psu);
-
-	sysfs_method->initPowerSupply();
+    // Try DBus, otherwise, if error - use SysFS
+    this->dbus_method = new QBattDBusMethod(&this->psu);
+    bool success = this->dbus_method->initPowerSupply();
+    if (success) {
+        this->method = METHOD_DBUS;
+    } else {
+        delete this->dbus_method;
+        this->sysfs_method = new QBattSysFSMethod(&this->psu);
+        this->sysfs_method->initPowerSupply();
+        this->method = METHOD_SYSFS;
+    }
 }
 
 QBattStats::~QBattStats()
 {
-	delete sysfs_method;
+    if (this->method == METHOD_DBUS)
+        delete this->dbus_method;
+    else if (this->method == METHOD_SYSFS)
+        delete this->sysfs_method;
 }
 
 void QBattStats::updatePowerSupplyInfo()
 {
-	sysfs_method->updatePowerSupply();
+    if (this->method == METHOD_DBUS)
+        this->dbus_method->updatePowerSupply();
+    else if (this->method == METHOD_SYSFS)
+        sysfs_method->updatePowerSupply();
 }
 
 int QBattStats::getBatteryCapacity()
