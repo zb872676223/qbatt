@@ -100,10 +100,22 @@ void QBattMain::updateTrayLabel()
     else
         trayToolTipText.append(QString().sprintf("n/a"));
 
+    /*
+     * Possible ways of getting the information about battery
+     * health are (at least):
+     * - comparing full charge and designed full charge
+     * - comparing stored energy value to its design value
+     */
     if ((stats->getBatteryChargeFull() > 0) &&
             (stats->getBatteryChargeFullDesign() > 0)) {
         battery_health = (stats->getBatteryChargeFull() * 100.0) /
                 stats->getBatteryChargeFullDesign() * 1.0;
+        trayToolTipText.append(QString().sprintf("\nHealth: %.1f%%",
+                                                 battery_health));
+    } else if ((stats->getBatteryEnergyFull() > 0) &&
+               (stats->getBatteryEnergyFullDesign() > 0)) {
+        battery_health = (stats->getBatteryEnergyFull() * 100.0) /
+                stats->getBatteryEnergyFullDesign() * 1.0;
         trayToolTipText.append(QString().sprintf("\nHealth: %.1f%%",
                                                  battery_health));
     }
