@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui
+QT       += core gui dbus
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -15,12 +15,14 @@ TEMPLATE = app
 SOURCES += main.cpp\
         qbattmain.cpp \
     qbattstats.cpp \
+    qbattdbusmethod.cpp \
     qbattsysfsmethod.cpp \
     qbatticon_t.cpp \
     qbatttray_t.cpp
 
 HEADERS  += qbattmain.h \
     qbattstats.h \
+    qbattdbusmethod.h \
     qbattsysfsmethod.h \
     qbattpsu.h \
     qbatticon_t.h \
