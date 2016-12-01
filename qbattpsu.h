@@ -38,9 +38,17 @@ typedef struct _psu_info {
 	battinfo_t	battery;
 } psuinfo_t;
 
+typedef enum {
+    BATT_CHARGING       = 1,
+    BATT_DISCHARGING    = 2,
+    BATT_FULL           = 4,
+    BATT_UNKNOWN
+} tBatteryChargeState;
+
 static const QString BATT_STATUS_UNKNOWN		= "Unknown";
 static const QString BATT_STATUS_DISCHARGING	= "Discharging";
 static const QString BATT_STATUS_CHARGING		= "Charging";
+static const QString BATT_STATUS_FULL           = "Full";
 
 #endif // QBATTPSU
 
