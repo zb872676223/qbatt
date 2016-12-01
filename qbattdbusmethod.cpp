@@ -15,7 +15,8 @@ static const QString DBUS_BATT_PRESENT              = "IsPresent";          // B
 static const QString DBUS_BATT_SERIAL_NUMBER        = "Serial";             // String (DBus)
 static const QString DBUS_BATT_TECHNOLOGY           = "Technology";         // Uint32 (DBus)
 static const QString DBUS_BATT_VOLTAGE_NOW          = "Voltage";            // Double (DBus)
-static const QString DBUS_BATT_ACAD_ONLINE          = "";
+static const QString DBUS_BATT_STATUS               = "State";              // Uint32 (DBus)
+static const QString DBUS_BATT_ACAD_ONLINE          = "Online";             // Boolean (DBus)
 
 QBattDBusMethod::QBattDBusMethod(psuinfo_t *psu)
 {
@@ -108,6 +109,8 @@ void QBattDBusMethod::updatePowerSupply()
 
 void QBattDBusMethod::parseDBusData(QMap<QString, QVariant> &value)
 {
+    tBatteryChargeState state;
+
     // Fill the data into the psuinfo_t structure
     this->psu->battery.psu_capacity             = value.value(DBUS_BATT_CAPACITY).toInt();
     this->psu->battery.psu_capacity_level       = value.value(DBUS_BATT_CAPACITY_LEVEL).toString();
@@ -121,4 +124,22 @@ void QBattDBusMethod::parseDBusData(QMap<QString, QVariant> &value)
     this->psu->battery.psu_serial_number        = value.value(DBUS_BATT_SERIAL_NUMBER).toString();
     this->psu->battery.psu_technology           = value.value(DBUS_BATT_TECHNOLOGY).toString();
     this->psu->battery.psu_voltage_now          = QVariant(value.value(DBUS_BATT_VOLTAGE_NOW).toDouble() * 100000UL).toInt();
+
+    state = (tBatteryChargeState)value.value(DBUS_BATT_STATUS).toInt();
+    switch (state) {
+    case BATT_CHARGING:
+        this->psu->battery.psu_status = BATT_STATUS_CHARGING;
+        break;
+    case BATT_DISCHARGING:
+        this->psu->battery.psu_status = BATT_STATUS_DISCHARGING;
+        break;
+    case BATT_FULL:
+        this->psu->battery.psu_status = BATT_STATUS_FULL;
+        break;
+    default:
+        this->psu->battery.psu_status = BATT_STATUS_UNKNOWN;
+        break;
+    }
+
+    this->psu->ac_adapter.online                = value.value(DBUS_BATT_ACAD_ONLINE).toInt();
 }
