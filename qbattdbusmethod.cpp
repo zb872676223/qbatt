@@ -17,6 +17,8 @@ static const QString DBUS_BATT_TECHNOLOGY           = "Technology";         // U
 static const QString DBUS_BATT_VOLTAGE_NOW          = "Voltage";            // Double (DBus)
 static const QString DBUS_BATT_STATUS               = "State";              // Uint32 (DBus)
 static const QString DBUS_BATT_ACAD_ONLINE          = "Online";             // Boolean (DBus)
+static const QString DBUS_BATT_TIME_TO_EMPTY        = "TimeToEmpty";        // Int64 (DBus)
+static const QString DBUS_BATT_TIME_TO_FULL         = "TimeToFull";         // Int64 (DBus)
 
 QBattDBusMethod::QBattDBusMethod(psuinfo_t *psu)
 {
@@ -46,13 +48,13 @@ bool QBattDBusMethod::initPowerSupply()
         }
         argument.endArray();
 
-        this->dbus_path = QString(path.path());
+        this->psu->battery.path = QString(path.path());
     } else {
         return false;
     }
 
     this->dbus_msg = QDBusMessage::createMethodCall("org.freedesktop.UPower",
-                                         this->dbus_path,
+                                         this->psu->battery.path,
                                          "org.freedesktop.DBus.Properties",
                                          "GetAll");
     args.append("org.freedesktop.UPower.Device");

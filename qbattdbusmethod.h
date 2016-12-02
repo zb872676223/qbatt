@@ -17,7 +17,6 @@ private:
 
 private:
     QDBusMessage        dbus_msg;
-    QString             dbus_path;
     psuinfo_t           *psu;
     bool                request_in_progress;
 };
