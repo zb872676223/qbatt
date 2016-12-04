@@ -179,21 +179,36 @@ void QBattDBusMethod::updatePowerSupply()
         // Set the flag
         this->request_in_progress = true;
 
+        // Issue Refresh() method call for AC adapter
         QDBusMessage msg;
+        msg = QDBusMessage::createMethodCall("org.freedesktop.UPower",
+                                             this->psu->ac_adapter.path,
+                                             "org.freedesktop.UPower.Device",
+                                             "Refresh");
+        QDBusPendingCall ret = QDBusConnection::systemBus().asyncCall(msg);
+        ret.waitForFinished();
 
         // Update ACAD
         msg = QDBusMessage::createMethodCall("org.freedesktop.UPower",
-                                                        this->psu->ac_adapter.path,
-                                                        "org.freedesktop.DBus.Properties",
-                                                        "GetAll");
+                                             this->psu->ac_adapter.path,
+                                             "org.freedesktop.DBus.Properties",
+                                             "GetAll");
         msg.setArguments(dbus_args);
         this->parseDBusData(this->parseDBusArgs(msg), SUPPLY_ACAD);
 
+        // Issue Refresh() method call for battery
+        msg = QDBusMessage::createMethodCall("org.freedesktop.UPower",
+                                             this->psu->battery.path,
+                                             "org.freedesktop.UPower.Device",
+                                             "Refresh");
+        ret = QDBusConnection::systemBus().asyncCall(msg);
+        ret.waitForFinished();
+
         // Update Battery
         msg = QDBusMessage::createMethodCall("org.freedesktop.UPower",
-                                                        this->psu->battery.path,
-                                                        "org.freedesktop.DBus.Properties",
-                                                        "GetAll");
+                                             this->psu->battery.path,
+                                             "org.freedesktop.DBus.Properties",
+                                             "GetAll");
         msg.setArguments(dbus_args);
         this->parseDBusData(this->parseDBusArgs(msg), SUPPLY_BATT);
 
