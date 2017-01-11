@@ -18,7 +18,8 @@ SOURCES += main.cpp\
     qbattdbusmethod.cpp \
     qbattsysfsmethod.cpp \
     qbatticon_t.cpp \
-    qbatttray_t.cpp
+    qbatttray_t.cpp \
+    qbattsingle.cpp
 
 HEADERS  += qbattmain.h \
     qbattstats.h \
@@ -26,7 +27,8 @@ HEADERS  += qbattmain.h \
     qbattsysfsmethod.h \
     qbattpsu.h \
     qbatticon_t.h \
-    qbatttray_t.h
+    qbatttray_t.h \
+    qbattsingle.h
 
 FORMS    +=
 

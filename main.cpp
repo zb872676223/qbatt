@@ -1,12 +1,18 @@
 #include <QApplication>
 #include "qbattmain.h"
+#include "qbattsingle.h"
 
 int main(int argc, char *argv[])
 {
-	QApplication a(argc, argv);
-	QBattMain w;
+    QBattSingle single_instance("qbatt_single_instance");
 
-	a.setQuitOnLastWindowClosed(false);
+    if (!single_instance.tryToRun())
+        return EXIT_FAILURE;
 
-	return a.exec();
+    QApplication a(argc, argv);
+    QBattMain w;
+
+    a.setQuitOnLastWindowClosed(false);
+
+    return a.exec();
 }
