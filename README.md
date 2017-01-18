@@ -7,5 +7,11 @@ which i3blocks executes and reads its output which is later used in its status
 bar. I just was thinking about how to make the information about the battery more
 convenient. This is how qbatt project came.
 
-For the present moment it uses sysfs to read the information about the battery/ac
-adapter, but I plan to stick to something more reliable in the future.
+Qbatt supports two data collection mechanisms: D-Bus and SysFS. By-default it tries
+to use D-Bus as most preferrable method, otherwise qbatt uses SysFS method.
+
+TODO:
+    - add option for builder which will allow to use one collection mechanism only.
+    
+Thoughts:
+    - implement gathering the data from attached UPS using D-Bus.
