@@ -44,6 +44,7 @@ QBattMain::~QBattMain()
 void QBattMain::updateTrayLabel()
 {
     // Update PSU information first
+    int voltageNow = 0;
     int currentRate = -1;
     float battery_health = 0.0;
     stats->updatePowerSupplyInfo();
@@ -90,6 +91,12 @@ void QBattMain::updateTrayLabel()
                                                      currentRate));
             trayToolTipText.append("\nTime left: ");
             trayToolTipText.append(stats->getTimeLeft());
+
+            // Show battery voltage only when either it is charging or discharging
+            voltageNow = stats->getBatteryVoltageNow();
+            if (voltageNow != -1)
+                trayToolTipText.append(QString().sprintf("\nVoltage: %.2f V",
+                                                         (voltageNow * 1.0) / 1000 / 100));
         }
 
         trayText.sprintf("%d", trayCapacity);
